@@ -4,6 +4,7 @@ import random
 import array
 from timeit import default_timer as timer
 import matplotlib.pyplot as plt
+import sys
 
 
 def list_DGEMM(A, B, C):
@@ -38,14 +39,15 @@ if __name__ == "__main__":
     A = np.array([[5.2, 2.2, 1], [1.3, 2.2, 1.9], [1, 4.5, 3.0]])
     B = np.array([[4.3, 2.3, 8.0], [1.3, 5.5, 7.3], [9.1, 5.3, 3.5]])
     C = np.array([[6.2, 8.8, 6.4], [5.1, 2.0, 9.2], [0.7, 8.2, 4.8]])
-    print(type(A[0, 0]))
+    
+    print(sys.getsizeof(A))
     correct_solution = C+np.matmul(A, B)
     print("Numpy: \n", np_array_DGEMM(A, B, C))
     # Lists
     A = [[5.2, 2.2, 1], [1.3, 2.2, 1.9], [1, 4.5, 3.0]]
     B = [[4.3, 2.3, 8.0], [1.3, 5.5, 7.3], [9.1, 5.3, 3.5]]
     C = [[6.2, 8.8, 6.4], [5.1, 2.0, 9.2], [0.7, 8.2, 4.8]]
-    print(type(A[0][0]))
+    print(sys.getsizeof(A))
     print("List: \n", list_DGEMM(A, B, C))
     # Arrays
     A = [array.array('d', [5.2, 2.2, 1]),
@@ -57,15 +59,14 @@ if __name__ == "__main__":
     C = [array.array('d', [6.2, 8.8, 6.4]),
          array.array('d', [5.1, 2.0, 9.2]),
          array.array('d', [0.7, 8.2, 4.8])]
-    print(type(A[0][0]))
     print("Array: \n", array_DGEMM(A, B, C))
+    print(sys.getsizeof(A))
     print("Correct solution: \n", correct_solution)
-
 
     # Task 2: Increase matrix and report mean+std
     # # Lists
     size_m_max = 10
-    size_range = range(3, size_m_max)
+    size_range = range(3, size_m_max,3)
     times_list = [1]*(len(size_range))
     times_array = [1]*(len(size_range))
     times_np_array = [1]*(len(size_range))
@@ -93,11 +94,16 @@ if __name__ == "__main__":
         times_np_array[i] = timer() - start
 
         # Array:
-        M = []
+        A = []
+        B = []
+        C = []
         for j in range(size_m):
-            M.append(array.array('d', [np.random.randint(0, 100)
+            A.append(array.array('d', [np.random.randint(0, 100)
                                        for e in range(size_m)]))
-
+            B.append(array.array('d', [np.random.randint(0, 100)
+                        for e in range(size_m)]))
+            C.append(array.array('d', [np.random.randint(0, 100)
+                        for e in range(size_m)]))
         start = timer()
         array_DGEMM(A, B, C)
         times_array[i] = timer() - start
@@ -116,7 +122,7 @@ if __name__ == "__main__":
     plt.xlabel("Size of matrix (NxN)")
     plt.ylabel("Time (s)")
     plt.legend()
-    plt.savefig('Assignment 2/runtimes_for_DGEMMs.png')
+    # plt.savefig('Assignment 2/runtimes_for_DGEMMs.png')
     plt.show()
 
     # Task 4.3 L1 Cache
@@ -130,3 +136,11 @@ if __name__ == "__main__":
     # We have 3 Matrices -> 16 000 / 3 = 5333 elements per matrix fit into the cache.
     # sqrt(5333) = 73 is the number of rows/cols per matrix that could fit into the cache.
     # Though, there are probably other processes running thus we can probably fit only about three 50x50 matrices in L1.
+    # When N < 20, All are quite similar in performance.
+    # Afterwards Numpy implementation starts getting slower than others.
+    # At about N=54, there is a spike, could be due to L1 cache not being big enough.
+    # If we would have done the numpy as vector operations (C += np.matmul(A,b)), numpy would probably be better.
+
+    # Task 4.4
+    # N^3 iterations per function call
+    # 
