@@ -65,7 +65,7 @@ if __name__ == "__main__":
 
     # Task 2: Increase matrix and report mean+std
     # # Lists
-    size_m_max = 10
+    size_m_max = 100
     size_range = range(3, size_m_max,3)
     times_list = [1]*(len(size_range))
     times_array = [1]*(len(size_range))
@@ -116,14 +116,14 @@ if __name__ == "__main__":
     print(
         f"Mean Numpy Array: {mean(times_np_array)}, std: {np.std(times_np_array)}")
 
-    plt.plot(size_range, times_list, label="List")
-    plt.plot(size_range, times_array, label="Array")
-    plt.plot(size_range, times_np_array, label="Numpy Array")
-    plt.xlabel("Size of matrix (NxN)")
-    plt.ylabel("Time (s)")
-    plt.legend()
-    # plt.savefig('Assignment 2/runtimes_for_DGEMMs.png')
-    plt.show()
+    # plt.plot(size_range, times_list, label="List")
+    # plt.plot(size_range, times_array, label="Array")
+    # plt.plot(size_range, times_np_array, label="Numpy Array")
+    # plt.xlabel("Size of matrix (NxN)")
+    # plt.ylabel("Time (s)")
+    # plt.legend()
+    # # plt.savefig('Assignment 2/runtimes_for_DGEMMs.png')
+    # plt.show()
 
     # Task 4.3 L1 Cache
 
@@ -143,4 +143,33 @@ if __name__ == "__main__":
 
     # Task 4.4
     # N^3 iterations per function call
-    # 
+    # assignment, addition and multiplication = 3 FLOPS per iteration
+    # -> 3*N^3 FLOPS per function call
+
+    plt.plot([3*x**3 for x in size_range], times_list, label="List")
+    plt.plot([3*x**3 for x in size_range], times_array, label="Array")
+    plt.plot([3*x**3 for x in size_range], times_np_array, label="Numpy Array")
+    plt.ylabel("Time (s)")
+    plt.xlabel("FLOPS")
+    plt.legend()
+    # plt.savefig('Assignment 2/runtimes_for_DGEMMs.png')
+    plt.show()
+    print("List FLOPS/s: ",np.mean(np.array([3*x**3 for x in size_range]) / np.array(times_list)))
+    print("Array FLOPS/s: ",np.mean(np.array([3*x**3 for x in size_range]) / np.array(times_array)))
+    print("Numpy Array FLOPS/s: ",np.mean(np.array([3*x**3 for x in size_range]) / np.array(times_np_array)))
+
+    # Johannes' clock frequency is 2.5 GHz (boost 2.7GHz)
+
+    # Mean List: 0.065, std: 0.071
+    # Mean Array: 0.088, std: 0.103
+    # Mean Numpy Array: 0.205, std: 0.227
+    # List FLOPS/s:  11615887.09001009
+    # Array FLOPS/s:  8945534.14268164
+    # Numpy Array FLOPS/s:  3763664.0400562016
+
+    # Thus, 
+    # List FLOPS/s / Clock Frq:  11615887.09001009/2 500 000 000 = 0.005
+    # Array FLOPS/s / Clock Frq:  8945534.14268164/2 500 000 000 = 0.004
+    # Numpy Array FLOPS/s / Clock Frq:  3763664.0400562016/2 500 000 000 = 0.002
+
+    # The measured FLOPS/s is only about 4% of the theoretical limit of the computer.
