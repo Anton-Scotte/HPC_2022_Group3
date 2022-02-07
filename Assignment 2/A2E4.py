@@ -26,12 +26,12 @@ def array_DGEMM(A, B, C):
 
 
 def np_array_DGEMM(A, B, C):
-    N = len(A)
-    for i in range(N):
-        for j in range(N):
-            for k in range(N):
-                C[i, j] = C[i, j] + A[i, k] * B[k, j]
-    return C
+    # N = len(A)
+    # for i in range(N):
+    #     for j in range(N):
+    #         for k in range(N):
+    #             C[i, j] = C[i, j] + A[i, k] * B[k, j]
+    return C+np.matmul(A,B)
 
 
 if __name__ == "__main__":
@@ -65,7 +65,7 @@ if __name__ == "__main__":
 
     # Task 2: Increase matrix and report mean+std
     # # Lists
-    size_m_max = 100
+    size_m_max = 200
     size_range = range(3, size_m_max,3)
     times_list = [1]*(len(size_range))
     times_array = [1]*(len(size_range))
@@ -83,7 +83,11 @@ if __name__ == "__main__":
         start = timer()
         list_DGEMM(A, B, C)
         times_list[i] = timer() - start
-
+        i += 1
+        if i % 50 == 0:
+            print(f"List size {i} done.")
+    i=0
+    for size_m in size_range:
         # Numpy
         A = np.random.rand(size_m, size_m)*100
         B = np.random.rand(size_m, size_m)*100
@@ -92,7 +96,11 @@ if __name__ == "__main__":
         start = timer()
         np_array_DGEMM(A, B, C)
         times_np_array[i] = timer() - start
-
+        i += 1
+        if i % 50 == 0:
+            print(f"Numpy size {i} done.")
+    i=0
+    for size_m in size_range:    
         # Array:
         A = []
         B = []
@@ -109,21 +117,22 @@ if __name__ == "__main__":
         times_array[i] = timer() - start
         i += 1
         if i % 50 == 0:
-            print(f"Matrix size {i} done.")
+            print(f"Array size {i} done.")
 
     print(f"Mean List: {mean(times_list)}, std: {np.std(times_list)}")
     print(f"Mean Array: {mean(times_array)}, std: {np.std(times_array)}")
     print(
         f"Mean Numpy Array: {mean(times_np_array)}, std: {np.std(times_np_array)}")
 
-    # plt.plot(size_range, times_list, label="List")
-    # plt.plot(size_range, times_array, label="Array")
-    # plt.plot(size_range, times_np_array, label="Numpy Array")
-    # plt.xlabel("Size of matrix (NxN)")
-    # plt.ylabel("Time (s)")
-    # plt.legend()
-    # # plt.savefig('Assignment 2/runtimes_for_DGEMMs.png')
-    # plt.show()
+    plt.plot(size_range, times_list, label="List")
+    plt.plot(size_range, times_array, label="Array")
+    plt.plot(size_range, times_np_array, label="Numpy Array")
+    plt.xlabel("Size of matrix (NxN)")
+    plt.ylabel("Time (s)")
+    plt.semilogy()
+    plt.legend()
+    plt.savefig('Assignment 2/runtimes_for_DGEMMs_vectorization.png')
+    plt.show()
 
     # Task 4.3 L1 Cache
 
@@ -136,40 +145,42 @@ if __name__ == "__main__":
     # We have 3 Matrices -> 16 000 / 3 = 5333 elements per matrix fit into the cache.
     # sqrt(5333) = 73 is the number of rows/cols per matrix that could fit into the cache.
     # Though, there are probably other processes running thus we can probably fit only about three 50x50 matrices in L1.
-    # When N < 20, All are quite similar in performance.
     # Afterwards Numpy implementation starts getting slower than others.
-    # At about N=54, there is a spike, could be due to L1 cache not being big enough.
-    # If we would have done the numpy as vector operations (C += np.matmul(A,b)), numpy would probably be better.
+    # At about N=44, there is a spike on the numpy implementation, could be due to L1 cache not being big enough.
+
 
     # Task 4.4
     # N^3 iterations per function call
     # assignment, addition and multiplication = 3 FLOPS per iteration
     # -> 3*N^3 FLOPS per function call
 
-    plt.plot([3*x**3 for x in size_range], times_list, label="List")
-    plt.plot([3*x**3 for x in size_range], times_array, label="Array")
-    plt.plot([3*x**3 for x in size_range], times_np_array, label="Numpy Array")
-    plt.ylabel("Time (s)")
-    plt.xlabel("FLOPS")
-    plt.legend()
-    # plt.savefig('Assignment 2/runtimes_for_DGEMMs.png')
-    plt.show()
+    # For Numpy implementation, there are 2N^2+N^2 (matmul = 2n^2-n^2, addition n^2, assignment n^2) FLOPS per function call
+
+    # plt.plot([3*x**3 for x in size_range], times_list, label="List")
+    # plt.plot([3*x**3 for x in size_range], times_array, label="Array")
+    # plt.plot([3*x**3 for x in size_range], times_np_array, label="Numpy Array")
+    # plt.ylabel("Time (s)")
+    # plt.xlabel("FLOPS")
+    # plt.legend()
+    # # plt.savefig('Assignment 2/runtimes_for_DGEMMs.png')
+    # plt.show()
     print("List FLOPS/s: ",np.mean(np.array([3*x**3 for x in size_range]) / np.array(times_list)))
     print("Array FLOPS/s: ",np.mean(np.array([3*x**3 for x in size_range]) / np.array(times_array)))
-    print("Numpy Array FLOPS/s: ",np.mean(np.array([3*x**3 for x in size_range]) / np.array(times_np_array)))
+    print("Numpy Array FLOPS/s: ",np.mean(np.array([2*x^2+x^2 for x in size_range]) / np.array(times_np_array)))
 
     # Johannes' clock frequency is 2.5 GHz (boost 2.7GHz)
 
-    # Mean List: 0.065, std: 0.071
-    # Mean Array: 0.088, std: 0.103
-    # Mean Numpy Array: 0.205, std: 0.227
-    # List FLOPS/s:  11615887.09001009
-    # Array FLOPS/s:  8945534.14268164
-    # Numpy Array FLOPS/s:  3763664.0400562016
+    # Mean List: 0.5003616742424241, std: 0.5592229448440301
+    # Mean Array: 0.7102736909090908, std: 0.8121135599432922
+    # Mean Numpy Array: 0.00016189242424244102, std: 0.00015840794699113962
+    # List FLOPS/s:  11418098.445513315
+    # Array FLOPS/s:  8670588.630288439
+    # Numpy Array FLOPS/s:  2427991.4751817994
 
     # Thus, 
-    # List FLOPS/s / Clock Frq:  11615887.09001009/2 500 000 000 = 0.005
-    # Array FLOPS/s / Clock Frq:  8945534.14268164/2 500 000 000 = 0.004
-    # Numpy Array FLOPS/s / Clock Frq:  3763664.0400562016/2 500 000 000 = 0.002
+    # List FLOPS/s / Clock Frq:  11418098.445513315/2 500 000 000 = 0.005
+    # Array FLOPS/s / Clock Frq:  8670588.630288439/2 500 000 000 = 0.003
+    # Numpy Array FLOPS/s / Clock Frq:  2427991.4751817994/2 500 000 000 = 0.001
 
     # The measured FLOPS/s is only about 4% of the theoretical limit of the computer.
+    #For numpy implementation, the FLOPS/s is much lower, but this is due to it making significantly less operations (vectorization)
