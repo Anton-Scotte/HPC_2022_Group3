@@ -5,6 +5,7 @@ import array
 from timeit import default_timer as timer
 import matplotlib.pyplot as plt
 import sys
+# import numexpr as ne
 
 
 def list_DGEMM(A, B, C):
@@ -31,7 +32,17 @@ def np_array_DGEMM(A, B, C):
     #     for j in range(N):
     #         for k in range(N):
     #             C[i, j] = C[i, j] + A[i, k] * B[k, j]
-    return C+np.matmul(A,B)
+    C = C+np.matmul(A,B)
+    return C
+
+# def np_array_numexpr_DGEMM(A, B, C):
+#     # N = len(A)
+#     # for i in range(N):
+#     #     for j in range(N):
+#     #         for k in range(N):
+#     #             C[i, j] = C[i, j] + A[i, k] * B[k, j]
+#     C = ne.evaluate('C+A*B')
+#     return C
 
 
 if __name__ == "__main__":
@@ -63,9 +74,16 @@ if __name__ == "__main__":
     print(sys.getsizeof(A))
     print("Correct solution: \n", correct_solution)
 
+    # DOESNT WORK FOR JOHANNES (NO MODULE FOUND EVEN THOUGH INSTALLED??)
+    # # Numpy with numexpr
+    # A = np.array([[5.2, 2.2, 1], [1.3, 2.2, 1.9], [1, 4.5, 3.0]])
+    # B = np.array([[4.3, 2.3, 8.0], [1.3, 5.5, 7.3], [9.1, 5.3, 3.5]])
+    # C = np.array([[6.2, 8.8, 6.4], [5.1, 2.0, 9.2], [0.7, 8.2, 4.8]])
+    # print("Numpy with numexpr: \n", np_array_numexpr_DGEMM(A, B, C))
+
     # Task 2: Increase matrix and report mean+std
     # # Lists
-    size_m_max = 200
+    size_m_max = 10
     size_range = range(3, size_m_max,3)
     times_list = [1]*(len(size_range))
     times_array = [1]*(len(size_range))
@@ -131,7 +149,7 @@ if __name__ == "__main__":
     plt.ylabel("Time (s)")
     plt.semilogy()
     plt.legend()
-    plt.savefig('Assignment 2/runtimes_for_DGEMMs_vectorization.png')
+    # plt.savefig('Assignment 2/runtimes_for_DGEMMs_vectorization.png')
     plt.show()
 
     # Task 4.3 L1 Cache
@@ -184,3 +202,7 @@ if __name__ == "__main__":
 
     # The measured FLOPS/s is only about 4% of the theoretical limit of the computer.
     #For numpy implementation, the FLOPS/s is much lower, but this is due to it making significantly less operations (vectorization)
+
+    # Task 4.7 
+
+    # TODO: get numexpr working, not working for me -Johannes
