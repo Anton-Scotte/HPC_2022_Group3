@@ -35,33 +35,36 @@ def np_array_DGEMM(A, B, C):
 
 if __name__ == "__main__":
     # Numpy
-    A = np.array([[5, 2, 1], [1, 2, 1], [1, 4, 3]])
-    B = np.array([[4, 2, 8], [1, 5, 7], [9, 5, 3]])
-    C = np.array([[6, 8, 6], [5, 2, 9], [0, 8, 4]])
+    A = np.array([[5.2, 2.2, 1], [1.3, 2.2, 1.9], [1, 4.5, 3.0]])
+    B = np.array([[4.3, 2.3, 8.0], [1.3, 5.5, 7.3], [9.1, 5.3, 3.5]])
+    C = np.array([[6.2, 8.8, 6.4], [5.1, 2.0, 9.2], [0.7, 8.2, 4.8]])
+    print(type(A[0, 0]))
     correct_solution = C+np.matmul(A, B)
     print("Numpy: \n", np_array_DGEMM(A, B, C))
     # Lists
-    A = [[5, 2, 1], [1, 2, 1], [1, 4, 3]]
-    B = [[4, 2, 8], [1, 5, 7], [9, 5, 3]]
-    C = [[6, 8, 6], [5, 2, 9], [0, 8, 4]]
-
+    A = [[5.2, 2.2, 1], [1.3, 2.2, 1.9], [1, 4.5, 3.0]]
+    B = [[4.3, 2.3, 8.0], [1.3, 5.5, 7.3], [9.1, 5.3, 3.5]]
+    C = [[6.2, 8.8, 6.4], [5.1, 2.0, 9.2], [0.7, 8.2, 4.8]]
+    print(type(A[0][0]))
     print("List: \n", list_DGEMM(A, B, C))
     # Arrays
-    A = [array.array('i', [5, 2, 1]),
-         array.array('i', [1, 2, 1]),
-         array.array('i', [1, 4, 3])]
-    B = [array.array('i', [4, 2, 8]),
-         array.array('i', [1, 5, 7]),
-         array.array('i', [9, 5, 3])]
-    C = [array.array('i', [6, 8, 6]),
-         array.array('i', [5, 2, 9]),
-         array.array('i', [0, 8, 4])]
+    A = [array.array('d', [5.2, 2.2, 1]),
+         array.array('d', [1.3, 2.2, 1.9]),
+         array.array('d', [1, 4.5, 3.0])]
+    B = [array.array('d', [4.3, 2.3, 8.0]),
+         array.array('d', [1.3, 5.5, 7.3]),
+         array.array('d', [9.1, 5.3, 3.5])]
+    C = [array.array('d', [6.2, 8.8, 6.4]),
+         array.array('d', [5.1, 2.0, 9.2]),
+         array.array('d', [0.7, 8.2, 4.8])]
+    print(type(A[0][0]))
     print("Array: \n", array_DGEMM(A, B, C))
     print("Correct solution: \n", correct_solution)
 
+
     # Task 2: Increase matrix and report mean+std
     # # Lists
-    size_m_max = 100
+    size_m_max = 10
     size_range = range(3, size_m_max)
     times_list = [1]*(len(size_range))
     times_array = [1]*(len(size_range))
@@ -70,20 +73,20 @@ if __name__ == "__main__":
     for size_m in size_range:
 
         # lists
-        A = [[np.random.randint(0, 100) for e in range(size_m)]
+        A = [[np.random.rand()*100 for e in range(size_m)]
              for e in range(size_m)]
-        B = [[np.random.randint(0, 100) for e in range(size_m)]
+        B = [[np.random.rand()*100 for e in range(size_m)]
              for e in range(size_m)]
-        C = [[np.random.randint(0, 100) for e in range(size_m)]
+        C = [[np.random.rand()*100 for e in range(size_m)]
              for e in range(size_m)]
         start = timer()
         list_DGEMM(A, B, C)
         times_list[i] = timer() - start
 
         # Numpy
-        A = np.random.randint(0, 100, (size_m, size_m))
-        B = np.random.randint(0, 100, (size_m, size_m))
-        C = np.random.randint(0, 100, (size_m, size_m))
+        A = np.random.rand(size_m, size_m)*100
+        B = np.random.rand(size_m, size_m)*100
+        C = np.random.rand(size_m, size_m)*100
 
         start = timer()
         np_array_DGEMM(A, B, C)
@@ -92,13 +95,15 @@ if __name__ == "__main__":
         # Array:
         M = []
         for j in range(size_m):
-            M.append(array.array('i', [random.randint(0, 100)
+            M.append(array.array('d', [np.random.randint(0, 100)
                                        for e in range(size_m)]))
 
         start = timer()
         array_DGEMM(A, B, C)
         times_array[i] = timer() - start
         i += 1
+        if i % 50 == 0:
+            print(f"Matrix size {i} done.")
 
     print(f"Mean List: {mean(times_list)}, std: {np.std(times_list)}")
     print(f"Mean Array: {mean(times_array)}, std: {np.std(times_array)}")
@@ -111,5 +116,17 @@ if __name__ == "__main__":
     plt.xlabel("Size of matrix (NxN)")
     plt.ylabel("Time (s)")
     plt.legend()
-    # plt.show()
-    plt.savefig('runtimes_for_DGEMMs.png')
+    plt.savefig('Assignment 2/runtimes_for_DGEMMs.png')
+    plt.show()
+
+    # Task 4.3 L1 Cache
+
+    # Cache sizes for Johannes:
+    # L1 = 128KB
+    # L2 = 512KB
+    # L3 = 3MB
+
+    # number of grid elements we can store in total (128 kilobytes) / (64 bits) = 16 000
+    # We have 3 Matrices -> 16 000 / 3 = 5333 elements per matrix fit into the cache.
+    # sqrt(5333) = 73 is the number of rows/cols per matrix that could fit into the cache.
+    # Though, there are probably other processes running thus we can probably fit only about three 50x50 matrices in L1.
