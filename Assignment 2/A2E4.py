@@ -1,10 +1,12 @@
 from statistics import mean
 import numpy as np
+from numexpr import evaluate
 import random
 import array
 from timeit import default_timer as timer
 import matplotlib.pyplot as plt
 import sys
+np.show_config()
 # import numexpr as ne
 
 
@@ -27,22 +29,25 @@ def array_DGEMM(A, B, C):
 
 
 def np_array_DGEMM(A, B, C):
-    # N = len(A)
-    # for i in range(N):
-    #     for j in range(N):
-    #         for k in range(N):
-    #             C[i, j] = C[i, j] + A[i, k] * B[k, j]
+    #N = len(A)
+    #for i in range(N):
+    #    for j in range(N):
+    #        for k in range(N):
+    #            C[i, j] = C[i, j] + A[i, k] * B[k, j]
     C = C+np.matmul(A,B)
     return C
 
-# def np_array_numexpr_DGEMM(A, B, C):
-#     # N = len(A)
-#     # for i in range(N):
-#     #     for j in range(N):
-#     #         for k in range(N):
-#     #             C[i, j] = C[i, j] + A[i, k] * B[k, j]
-#     C = ne.evaluate('C+A*B')
-#     return C
+def np_array_numexpr_DGEMM(A, B, C):
+    #N = len(A)
+    #for i in range(N):
+    #    for j in range(N):
+    #        for k in range(N):
+    #            C_ij = C[i, j]
+    #            A_ik = A[i, k]
+    #            B_kj = B[k, j]
+    #            C[i, j] = evaluate("C_ij + A_ik*B_kj")
+    C = evaluate("C + A*B")
+    return C
 
 
 if __name__ == "__main__":
@@ -50,7 +55,7 @@ if __name__ == "__main__":
     A = np.array([[5.2, 2.2, 1], [1.3, 2.2, 1.9], [1, 4.5, 3.0]])
     B = np.array([[4.3, 2.3, 8.0], [1.3, 5.5, 7.3], [9.1, 5.3, 3.5]])
     C = np.array([[6.2, 8.8, 6.4], [5.1, 2.0, 9.2], [0.7, 8.2, 4.8]])
-    
+
     print(sys.getsizeof(A))
     correct_solution = C+np.matmul(A, B)
     print("Numpy: \n", np_array_DGEMM(A, B, C))
@@ -76,18 +81,19 @@ if __name__ == "__main__":
 
     # DOESNT WORK FOR JOHANNES (NO MODULE FOUND EVEN THOUGH INSTALLED??)
     # # Numpy with numexpr
-    # A = np.array([[5.2, 2.2, 1], [1.3, 2.2, 1.9], [1, 4.5, 3.0]])
-    # B = np.array([[4.3, 2.3, 8.0], [1.3, 5.5, 7.3], [9.1, 5.3, 3.5]])
-    # C = np.array([[6.2, 8.8, 6.4], [5.1, 2.0, 9.2], [0.7, 8.2, 4.8]])
-    # print("Numpy with numexpr: \n", np_array_numexpr_DGEMM(A, B, C))
+    A = np.array([[5.2, 2.2, 1], [1.3, 2.2, 1.9], [1, 4.5, 3.0]])
+    B = np.array([[4.3, 2.3, 8.0], [1.3, 5.5, 7.3], [9.1, 5.3, 3.5]])
+    C = np.array([[6.2, 8.8, 6.4], [5.1, 2.0, 9.2], [0.7, 8.2, 4.8]])
+    print("Numpy with numexpr: \n", np_array_numexpr_DGEMM(A, B, C))
 
     # Task 2: Increase matrix and report mean+std
     # # Lists
-    size_m_max = 10
+    size_m_max = 256
     size_range = range(3, size_m_max,3)
     times_list = [1]*(len(size_range))
     times_array = [1]*(len(size_range))
     times_np_array = [1]*(len(size_range))
+    times_np_array_numexpr = [1]*(len(size_range))
     i = 0
     for size_m in size_range:
 
@@ -118,7 +124,7 @@ if __name__ == "__main__":
         if i % 50 == 0:
             print(f"Numpy size {i} done.")
     i=0
-    for size_m in size_range:    
+    for size_m in size_range:
         # Array:
         A = []
         B = []
@@ -137,14 +143,31 @@ if __name__ == "__main__":
         if i % 50 == 0:
             print(f"Array size {i} done.")
 
+    i=0
+    for size_m in size_range:
+        # numexpr
+        A = np.random.rand(size_m, size_m)*100
+        B = np.random.rand(size_m, size_m)*100
+        C = np.random.rand(size_m, size_m)*100
+
+        start = timer()
+        np_array_numexpr_DGEMM(A, B, C)
+        times_np_array_numexpr[i] = timer() - start
+        i += 1
+        if i % 50 == 0:
+            print(f"numexpr size {i} done.")
+
     print(f"Mean List: {mean(times_list)}, std: {np.std(times_list)}")
     print(f"Mean Array: {mean(times_array)}, std: {np.std(times_array)}")
     print(
         f"Mean Numpy Array: {mean(times_np_array)}, std: {np.std(times_np_array)}")
+    print(
+        f"Mean numexpr: {mean(times_np_array_numexpr)}, std: {np.std(times_np_array_numexpr)}")
 
     plt.plot(size_range, times_list, label="List")
     plt.plot(size_range, times_array, label="Array")
     plt.plot(size_range, times_np_array, label="Numpy Array")
+    plt.plot(size_range, times_np_array_numexpr, label="numexpr")
     plt.xlabel("Size of matrix (NxN)")
     plt.ylabel("Time (s)")
     plt.semilogy()
@@ -195,7 +218,7 @@ if __name__ == "__main__":
     # Array FLOPS/s:  8670588.630288439
     # Numpy Array FLOPS/s:  2427991.4751817994
 
-    # Thus, 
+    # Thus,
     # List FLOPS/s / Clock Frq:  11418098.445513315/2 500 000 000 = 0.005
     # Array FLOPS/s / Clock Frq:  8670588.630288439/2 500 000 000 = 0.003
     # Numpy Array FLOPS/s / Clock Frq:  2427991.4751817994/2 500 000 000 = 0.001
@@ -203,6 +226,6 @@ if __name__ == "__main__":
     # The measured FLOPS/s is only about 4% of the theoretical limit of the computer.
     #For numpy implementation, the FLOPS/s is much lower, but this is due to it making significantly less operations (vectorization)
 
-    # Task 4.7 
+    # Task 4.7
 
     # TODO: get numexpr working, not working for me -Johannes
