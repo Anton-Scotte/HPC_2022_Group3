@@ -54,6 +54,11 @@ def DFT_N_1024(x):
             Xi_o[k] += -xr[n] * sin + xi[n] * cos
     return np.array(Xr_o+1j*Xi_o).reshape((-1,1))
 
+
+#numpy.fft
+def NumPy_fft(x):
+    return np.fft.fft(x)
+
 if __name__ == "__main__":
     #Task 5.3 - For fixed input size N=1024 do profiling
     N = 1024
@@ -71,11 +76,12 @@ if __name__ == "__main__":
     for i,N in enumerate(N_set):
         x = np.random.uniform(0,50,N)
         start = timer()
-        DFT(x)
+        #DFT(x)
+        NumPy_fft(x)
         times[i] = timer()-start
         if i%50==0: print(f"Iteration {i}/{len(N_set)}.")
 
-    plt.plot(N_set, times, label="Numpy with optimization")
+    plt.plot(N_set, times, label="Numpy with NumPy fft")
     plt.xlabel("Size of vector")
     plt.ylabel("Time (s)")
     plt.semilogy()
