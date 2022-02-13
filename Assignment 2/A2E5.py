@@ -24,14 +24,16 @@ def DFT(x):
     N = len(xr)
     Xr_o = np.zeros(N)
     Xi_o = np.zeros(N)
+    pi = np.pi
     for k in range(N):
         for n in range(N):
+            cos = np.cos(n * k * 2*pi / N)
+            sin = np.sin(n * k * 2*pi / N)
             # Real part of X[k] 
-            Xr_o[k] += xr[n] * np.cos(n * k * 2*np.pi / N) + xi[n]*np.sin(n * k * 2*np.pi / N)
+            Xr_o[k] += xr[n] * cos + xi[n]* sin
             # Imaginary part of X[k] 
-            Xi_o[k] += -xr[n] * np.sin(n * k * 2*np.pi / N) + xi[n] * np.cos(n * k * 2*np.pi / N)
+            Xi_o[k] += -xr[n] * sin + xi[n] * cos
     return np.array(Xr_o+1j*Xi_o).reshape((-1,1))
-
 
 if __name__ == "__main__":
     # Initial tests
@@ -40,7 +42,7 @@ if __name__ == "__main__":
     # print(np.fft.fft(x).reshape((-1,1)))
 
 # Task 5.2. Measure the execution time, varying the input size from 8 to 1024 elements and plot it.
-    N_set = range(8,1025,3)
+    N_set = range(8,500,3)
     # N_set = range(8,200)
     times = np.zeros(len(N_set))
     for i,N in enumerate(N_set):
