@@ -1,10 +1,10 @@
-import cythonfn
+# import cythonfn_numpy
 
 import numpy as np
 import matplotlib.pyplot as plt
 from timeit import default_timer as timer
 
-"""
+
 def gauss_seidel(f):
     newf = f.copy()
     
@@ -14,9 +14,21 @@ def gauss_seidel(f):
                                    newf[i+1,j] + newf[i-1,j])
     
     return newf
-"""
+
 
 if __name__ == '__main__':
+
+    # # Test individuals
+    # # Initialize grid
+    # x_1 = np.random.uniform(0,100, size = (40,40))
+    # x_2 = np.random.uniform(0,100, size = (40,40))
+    # # Set boundaries to zero
+    # x_1[:,np.r_[0,-1]]=0
+    # x_1[np.r_[0,-1],:]=0
+    # x_2[:,np.r_[0,-1]]=0
+    # x_2[np.r_[0,-1],:]=0
+
+    # # for i in range(1000):
 
     sizes = range(3,200,10)
     times = np.ones(len(sizes))
@@ -29,7 +41,7 @@ if __name__ == '__main__':
 
         start = timer()
         for j in range(1000):    
-            x = cythonfn.gauss_seidel(x)
+            x = gauss_seidel(x)
 
         if (size_ % 10 == 0) or (size_ % 3 == 0):
             print(f'Grid size {size_} done')
@@ -40,7 +52,3 @@ if __name__ == '__main__':
     plt.ylabel('Times (s)')
     plt.savefig("Assignment 3/A3E2_task_1_plot.png")
     plt.show()
-
-
-    # 20 = 2s
-    # 10*20 = 100*2s = 200
