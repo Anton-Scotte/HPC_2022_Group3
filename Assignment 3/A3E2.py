@@ -1,7 +1,10 @@
+import cythonfn
+
 import numpy as np
 import matplotlib.pyplot as plt
 from timeit import default_timer as timer
 
+"""
 def gauss_seidel(f):
     newf = f.copy()
     
@@ -11,7 +14,7 @@ def gauss_seidel(f):
                                    newf[i+1,j] + newf[i-1,j])
     
     return newf
-
+"""
 
 if __name__ == '__main__':
 
@@ -26,7 +29,7 @@ if __name__ == '__main__':
 
         start = timer()
         for j in range(1000):    
-            x = gauss_seidel(x)
+            x = cythonfn.gauss_seidel(x)
 
         if (size_ % 10 == 0) or (size_ % 3 == 0):
             print(f'Grid size {size_} done')
