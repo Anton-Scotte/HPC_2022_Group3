@@ -16,15 +16,13 @@ def gauss_seidel(f):
     return newf
 """
 
-
-
 if __name__ == '__main__':
 
-    sizes = range(3,50,10)
+    sizes = range(3,200,10)
     times = np.ones(len(sizes))
     for i,size_ in enumerate(sizes):
         # Initialize grid
-        x = np.random.randint(1000, size=(size_,size_))
+        x = x = np.random.uniform(0,100, size = (size_,size_))
         # Set boundaries to zero
         x[:,np.r_[0,-1]]=0
         x[np.r_[0,-1],:]=0
@@ -40,4 +38,9 @@ if __name__ == '__main__':
     plt.plot(sizes,times)
     plt.xlabel("Grid size NxN")
     plt.ylabel('Times (s)')
+    plt.savefig("Assignment 3/A3E2_task_1_plot.png")
     plt.show()
+
+
+    # 20 = 2s
+    # 10*20 = 100*2s = 200
