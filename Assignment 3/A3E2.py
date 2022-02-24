@@ -42,10 +42,10 @@ if __name__ == '__main__':
         start = timer()
         for j in range(1000):    
             x = gauss_seidel(x)
-
+        times[i] = timer()-start
         if (size_ % 10 == 0) or (size_ % 3 == 0):
             print(f'Grid size {size_} done')
-        times[i] = timer()-start
+
 
     plt.plot(sizes,times)
     plt.xlabel("Grid size NxN")
