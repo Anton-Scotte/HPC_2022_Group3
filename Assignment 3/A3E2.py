@@ -1,5 +1,5 @@
-# import cythonfn_numpy
-
+import cythonfn
+import cythonfn_numpy
 import numpy as np
 import matplotlib.pyplot as plt
 from timeit import default_timer as timer
@@ -41,8 +41,9 @@ if __name__ == '__main__':
 
         start = timer()
         for j in range(1000):    
-            x = gauss_seidel(x)
+        	x = cythonfn_numpy.gauss_seidel(x)
         times[i] = timer()-start
+
         if (size_ % 10 == 0) or (size_ % 3 == 0):
             print(f'Grid size {size_} done')
 
@@ -50,5 +51,5 @@ if __name__ == '__main__':
     plt.plot(sizes,times)
     plt.xlabel("Grid size NxN")
     plt.ylabel('Times (s)')
-    plt.savefig("Assignment 3/A3E2_task_1_plot.png")
+    #plt.savefig("Assignment 3/A3E2_task_1_plot.png")
     plt.show()
